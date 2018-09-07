@@ -1,0 +1,38 @@
+# define ANDROID_VERSION MAJOR, MINOR and PATCH
+
+ANDROID_VERSION_MAJOR := $(word 1, $(subst ., , $(PLATFORM_VERSION)))
+ANDROID_VERSION_MINOR := $(word 2, $(subst ., , $(PLATFORM_VERSION)))
+ANDROID_VERSION_PATCH := $(word 3, $(subst ., , $(PLATFORM_VERSION)))
+
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := libhwcnativewindow
+LOCAL_SRC_FILES := hwcomposer_window.cpp nativewindowbase.cpp
+LOCAL_SHARED_LIBRARIES := libsync liblog libnativewindow
+LOCAL_CFLAGS := \
+	-DANDROID_VERSION_MAJOR=$(ANDROID_VERSION_MAJOR) \
+	-DANDROID_VERSION_MINOR=$(ANDROID_VERSION_MINOR) \
+	-DANDROID_VERSION_PATCH=$(ANDROID_VERSION_PATCH)
+LOCAL_CFLAGS += -Wno-unused-parameter -UNDEBUG
+
+# Uncomment for CAF devices
+# LOCAL_CFLAGS += -DQCOM_BSP=1 -DQTI_BSP=1
+
+include $(BUILD_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := test_hwcomposer
+LOCAL_SRC_FILES := test_hwcomposer.cpp
+LOCAL_STATIC_LIBRARIES := libhwcnativewindow
+LOCAL_SHARED_LIBRARIES := libEGL libGLESv2 libdl libhardware libsync liblog libnativewindow libcutils
+LOCAL_CFLAGS := \
+	-DANDROID_VERSION_MAJOR=$(ANDROID_VERSION_MAJOR) \
+	-DANDROID_VERSION_MINOR=$(ANDROID_VERSION_MINOR) \
+	-DANDROID_VERSION_PATCH=$(ANDROID_VERSION_PATCH)
+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -UNDEBUG
+
+# Uncomment for CAF devices
+# LOCAL_CFLAGS += -DQCOM_BSP=1 -DQTI_BSP=1
+
+include $(BUILD_EXECUTABLE)
