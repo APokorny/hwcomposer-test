@@ -7,6 +7,17 @@ ANDROID_VERSION_PATCH := $(word 3, $(subst ., , $(PLATFORM_VERSION)))
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := libhybris-gralloc
+LOCAL_SRC_FILES := hybris-gralloc.c GrallocUsageConversion.cpp
+LOCAL_SHARED_LIBRARIES := libcutils
+LOCAL_CFLAGS := \
+	-DANDROID_VERSION_MAJOR=$(ANDROID_VERSION_MAJOR) \
+	-DANDROID_VERSION_MINOR=$(ANDROID_VERSION_MINOR) \
+	-DANDROID_VERSION_PATCH=$(ANDROID_VERSION_PATCH)
+LOCAL_CFLAGS += -Wno-unused-parameter -UNDEBUG -DHAS_GRALLOC1_HEADER=1
+include $(BUILD_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := libhwcnativewindow
 LOCAL_SRC_FILES := hwcomposer_window.cpp nativewindowbase.cpp
 LOCAL_SHARED_LIBRARIES := libsync liblog libnativewindow

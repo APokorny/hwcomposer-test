@@ -30,7 +30,10 @@ extern "C" {
 };
 
 #include <android/log.h>
-#define TRACE(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, "HWCNativeWindow", fmt "\n--> %s\n----> %s:%d", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__)
+//#define TRACE(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, "HWCNativeWindow", fmt "\n--> %s\n----> %s:%d", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__)
+#define TRACE(fmt, ...)
+
+#include "hybris-gralloc.h"
 
 extern "C" struct ANativeWindow *HWCNativeWindowCreate(unsigned int width, unsigned int height, unsigned int format, HWCPresentCallback present, void *cb_data)
 {
@@ -84,8 +87,7 @@ static pthread_cond_t _cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-HWComposerNativeWindowBuffer::HWComposerNativeWindowBuffer(alloc_device_t* alloc_device,
-                            unsigned int width,
+HWComposerNativeWindowBuffer::HWComposerNativeWindowBuffer(unsigned int width,
                             unsigned int height,
                             unsigned int format,
                             unsigned int usage)
@@ -97,13 +99,8 @@ HWComposerNativeWindowBuffer::HWComposerNativeWindowBuffer(alloc_device_t* alloc
     fenceFd = -1;
     busy = 0;
     status = 0;
-    m_alloc = alloc_device;
 
-    if (m_alloc) {
-        status = m_alloc->alloc(m_alloc,
-                            width, height, format, usage,
-                            &handle, &stride);
-    }
+    hybris_gralloc_allocate(width, height, format, usage, &handle, (uint32_t*)&stride);
 
     TRACE("width=%d height=%d stride=%d format=x%x usage=x%x status=%s this=%p",
         width, height, stride, format, usage, strerror(-status), this);
@@ -114,9 +111,7 @@ HWComposerNativeWindowBuffer::HWComposerNativeWindowBuffer(alloc_device_t* alloc
 HWComposerNativeWindowBuffer::~HWComposerNativeWindowBuffer()
 {
     TRACE("%p", this);
-    if (m_alloc && handle)
-        m_alloc->free(m_alloc, handle);
-
+    hybris_gralloc_release(handle, 1);
 }
 
 
@@ -124,18 +119,12 @@ HWComposerNativeWindowBuffer::~HWComposerNativeWindowBuffer()
 HWComposerNativeWindow::HWComposerNativeWindow(unsigned int width, unsigned int height, unsigned int format)
 {
     pthread_mutex_init(&m_mutex, 0);
-    m_alloc = NULL;
     m_width = width;
     m_height = height;
     m_bufFormat = format;
     m_usage = GRALLOC_USAGE_HW_COMPOSER|GRALLOC_USAGE_HW_FB;
     m_bufferCount = 2;
     m_nextBuffer = 0;
-}
-
-void HWComposerNativeWindow::setup(gralloc_module_t* gralloc, alloc_device_t* alloc)
-{
-    m_alloc = alloc;
 }
 
 HWComposerNativeWindow::~HWComposerNativeWindow()
@@ -489,7 +478,7 @@ void HWComposerNativeWindow::allocateBuffers()
     for(unsigned int i = 0; i < m_bufferCount; i++)
     {
         HWComposerNativeWindowBuffer *b
-         = new HWComposerNativeWindowBuffer(m_alloc, m_width, m_height, m_bufFormat, m_usage);
+         = new HWComposerNativeWindowBuffer(m_width, m_height, m_bufFormat, m_usage);
 
         b->common.incRef(&b->common);
 
@@ -499,7 +488,7 @@ void HWComposerNativeWindow::allocateBuffers()
 
         if (b->status) {
             b->common.decRef(&b->common);
-            fprintf(stderr,"WARNING: %s: allocated only %d buffers out of %d\n", __PRETTY_FUNCTION__, m_bufList.size(), m_bufferCount);
+            fprintf(stderr,"WARNING: %s: allocated only %lu buffers out of %d\n", __PRETTY_FUNCTION__, m_bufList.size(), m_bufferCount);
             break;
         }
 

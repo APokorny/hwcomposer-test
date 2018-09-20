@@ -28,6 +28,8 @@
 #include <malloc.h>
 #include <sync/sync.h>
 
+#include "hybris-gralloc.h"
+
 /* Regression test: make sure that there's no conflict between
  * the TLS (thread-local storage) slots used via libEGL/bionic
  * and the TLS space allocated by the host toolchain. The array
@@ -160,7 +162,7 @@ inline static uint32_t interpreted_version(hw_device_t *hwc_device)
 	return version;
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	EGLDisplay display;
 	EGLConfig ecfg;
@@ -180,25 +182,7 @@ int main(int argc, char **argv)
 
 	EGLBoolean rv;
 
-	int err;	
-
-	gralloc_module_t *gralloc = NULL;
-	alloc_device_t *alloc = 0;
-
-	err = hw_get_module(GRALLOC_HARDWARE_MODULE_ID, (const hw_module_t **) &gralloc);
-	if (gralloc==NULL) {
-		fprintf(stderr, "failed to get gralloc module: (%s)\n",strerror(-err));
-		assert(0);
-	}
-
-	err = gralloc_open((const hw_module_t *) gralloc, &alloc);
-	if (err) {
-		fprintf(stderr, "ERROR: failed to open gralloc: (%s)\n",strerror(-err));
-		assert(0);
-	}
-
-	framebuffer_device_t* fbDev = NULL;
-	framebuffer_open((const hw_module_t *) gralloc, &fbDev);
+	int err;
 
 	hw_module_t *hwcModule = 0;
 	hwc_composer_device_1_t *hwcDevicePtr = 0;
@@ -318,7 +302,7 @@ int main(int argc, char **argv)
 
 	HWComposer *win = new HWComposer(attr_values[0], attr_values[1], HAL_PIXEL_FORMAT_RGBA_8888, hwcDevicePtr, mList, &list->hwLayers[1]);
 	printf("created native window\n");
-	win->setup(gralloc, alloc);
+	hybris_gralloc_initialize(0);
 
 	display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	assert(eglGetError() == EGL_SUCCESS);
