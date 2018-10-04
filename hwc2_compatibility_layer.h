@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include <hardware/hwcomposer2.h>
 #include <system/graphics.h>
 
 #ifdef __cplusplus
@@ -44,7 +45,7 @@ extern "C" {
         hwc2_display_t display;
         int32_t width;
         int32_t height;
-        nsecs_t vsyncPeriod;
+        int64_t vsyncPeriod;
         float dpiX;
         float dpiY;
     } HWC2DisplayConfig;
@@ -62,8 +63,14 @@ extern "C" {
     typedef struct hwc2_compat_out_fences hwc2_compat_out_fences_t;
 
     hwc2_compat_device_t* hwc2_compat_device_new(bool);
-    void hwc2_compat_device_register_callback(HWC2EventListener* listener,
+    void hwc2_compat_device_register_callback(hwc2_compat_device_t* device,
+                                              HWC2EventListener* listener,
                                               int composerSequenceId);
+
+    void hwc2_compat_device_on_hotplug(hwc2_compat_device_t* device,
+                                       hwc2_display_t displayId,
+                                       bool connected);
+
     hwc2_compat_display_t* hwc2_compat_device_get_display_by_id(
                                 hwc2_compat_device_t* device,
                                 hwc2_display_t id);
@@ -71,15 +78,15 @@ extern "C" {
     HWC2DisplayConfig* hwc2_compat_display_get_active_config(
                                 hwc2_compat_display_t* display);
 
-    bool hwc2_compat_display_accept_changes(hwc2_compat_display_t* display);
+    hwc2_error_t hwc2_compat_display_accept_changes(hwc2_compat_display_t* display);
     hwc2_compat_layer_t* hwc2_compat_display_create_layer(hwc2_compat_display_t*
                                                           display);
     void hwc2_compat_display_destroy_layer(hwc2_compat_display_t* display,
                                            hwc2_compat_layer_t* layer);
 
-    bool hwc2_compat_display_get_release_fences(hwc2_compat_display_t* display,
-                                                hwc2_compat_out_fences_t**
-                                                outFences);
+    hwc2_error_t hwc2_compat_display_get_release_fences(
+                                        hwc2_compat_display_t* display,                                                hwc2_compat_out_fences_t** outFences);
+
     bool hwc2_compat_display_present(hwc2_compat_display_t* display,
                                      int32_t* outPresentFence);
 
@@ -94,7 +101,7 @@ extern "C" {
     bool hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
                                                int enabled);
 
-    int32_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
                                          uint32_t* outNumTypes,
                                          uint32_t* outNumRequests);
 
@@ -126,6 +133,10 @@ extern "C" {
     bool hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
                                               int32_t left, int32_t top,
                                               int32_t right, int32_t bottom);
+
+    int32_t hwc2_compat_out_fences_get_fence(hwc2_compat_out_fences_t* fences,
+                                             hwc2_compat_layer_t* layer);
+    void hwc2_compat_out_fences_destroy(hwc2_compat_out_fences_t* fences);
 
 #ifdef __cplusplus
 }

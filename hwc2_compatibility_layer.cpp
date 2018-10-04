@@ -107,6 +107,13 @@ void hwc2_compat_device_register_callback(hwc2_compat_device_t *device,
                                 composerSequenceId);
 }
 
+void hwc2_compat_device_on_hotplug(hwc2_compat_device_t* device,
+                                    hwc2_display_t displayId, bool connected)
+{
+    device->self->onHotplug(displayId,
+                            static_cast<HWC2::Connection>(connected));
+}
+
 hwc2_compat_display_t* hwc2_compat_device_get_display_by_id(
                             hwc2_compat_device_t *device, hwc2_display_t id)
 {
@@ -116,6 +123,11 @@ hwc2_compat_display_t* hwc2_compat_device_get_display_by_id(
         return nullptr;
 
     display->self = device->self->getDisplayById(id);
+
+    if (!display->self) {
+        free(display);
+        return nullptr;
+    }
 
     return display;
 }
@@ -153,6 +165,12 @@ HWC2DisplayConfig* hwc2_compat_display_get_active_config(
     return nullptr;
 }
 
+hwc2_error_t hwc2_compat_display_accept_changes(hwc2_compat_display_t* display)
+{
+    HWC2::Error error = display->self->acceptChanges();
+    return static_cast<hwc2_error_t>(error);
+}
+
 hwc2_compat_layer_t* hwc2_compat_display_create_layer(hwc2_compat_display_t* display)
 {
     hwc2_compat_layer_t *layer = (hwc2_compat_layer_t*) malloc(
@@ -174,16 +192,19 @@ void hwc2_compat_display_destroy_layer(hwc2_compat_display_t* display,
     free(layer);
 }
 
-hwc2_compat_out_fences_t* hwc2_compat_display_get_release_fences(hwc2_compat_display_t* display)
+hwc2_error_t hwc2_compat_display_get_release_fences(hwc2_compat_display_t* display,
+                                       hwc2_compat_out_fences_t** outFences)
 {
-    hwc2_compat_out_fences_t *fences = (hwc2_compat_out_fences_t*) malloc(
-        sizeof(hwc2_compat_out_fences_t));
-    if (!fences)
-        return nullptr;
+    hwc2_compat_out_fences_t *fences = new struct hwc2_compat_out_fences;
 
-    display->self->getReleaseFences(&fences->fences);
+    HWC2::Error error = display->self->getReleaseFences(&fences->fences);
+    if (error != HWC2::Error::None) {
+        delete fences;
+    } else {
+        *outFences = fences;
+    }
 
-    return fences;
+    return static_cast<hwc2_error_t>(error);
 }
 
 bool hwc2_compat_display_present(hwc2_compat_display_t* display,
@@ -235,12 +256,12 @@ bool hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
     return error == HWC2::Error::None;
 }
 
-int32_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
+hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
                                  uint32_t* outNumTypes,
                                  uint32_t* outNumRequests)
 {
     HWC2::Error error = display->self->validate(outNumTypes, outNumRequests);
-    return static_cast<int32_t>(error);
+    return static_cast<hwc2_error_t>(error);
 }
 
 bool hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode)
@@ -309,6 +330,7 @@ bool hwc2_compat_layer_set_transform(hwc2_compat_layer_t* layer,
         static_cast<HWC2::Transform>(transform));
     return error == HWC2::Error::None;
 }
+
 bool hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
                                             int32_t left, int32_t top,
                                             int32_t right, int32_t bottom)
@@ -317,4 +339,22 @@ bool hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
 
     HWC2::Error error = layer->self->setVisibleRegion(android::Region(r));
     return error == HWC2::Error::None;
+}
+
+int32_t hwc2_compat_out_fences_get_fence(hwc2_compat_out_fences_t* fences,
+                                         hwc2_compat_layer_t* layer)
+{
+    auto iter = fences->fences.find(layer->self);
+
+    if(iter != fences->fences.end()) {
+        return iter->second->dup();
+    } else {
+        return -1;
+    }
+}
+
+void hwc2_compat_out_fences_destroy(hwc2_compat_out_fences_t* fences)
+{
+    fences->fences.clear();
+    delete fences;
 }
