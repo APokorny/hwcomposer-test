@@ -207,7 +207,7 @@ hwc2_error_t hwc2_compat_display_get_release_fences(hwc2_compat_display_t* displ
     return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_display_present(hwc2_compat_display_t* display,
+hwc2_error_t hwc2_compat_display_present(hwc2_compat_display_t* display,
                                     int32_t* outPresentFence)
 {
     android::sp<android::Fence> presentFence;
@@ -215,10 +215,10 @@ bool hwc2_compat_display_present(hwc2_compat_display_t* display,
 
     *outPresentFence = presentFence->dup();
 
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_display_set_client_target(hwc2_compat_display_t* display,
+hwc2_error_t hwc2_compat_display_set_client_target(hwc2_compat_display_t* display,
                                             uint32_t slot,
                                             ANativeWindowBuffer* buffer,
                                             const int32_t acquireFenceFd,
@@ -237,23 +237,23 @@ bool hwc2_compat_display_set_client_target(hwc2_compat_display_t* display,
     HWC2::Error error = display->self->setClientTarget(0, target,
                                         acquireFence, HAL_DATASPACE_UNKNOWN);
 
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_display_set_power_mode(hwc2_compat_display_t* display,
+hwc2_error_t hwc2_compat_display_set_power_mode(hwc2_compat_display_t* display,
                                         int mode)
 {
     HWC2::Error error = display->self->setPowerMode(
         static_cast<HWC2::PowerMode>(mode));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
+hwc2_error_t hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
                                            int enabled)
 {
     HWC2::Error error = display->self->setVsyncEnabled(
         static_cast<HWC2::Vsync>(enabled));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
 hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
@@ -264,81 +264,81 @@ hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
     return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode)
+hwc2_error_t hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode)
 {
     HWC2::Error error = layer->self->setBlendMode(
         static_cast<HWC2::BlendMode>(mode));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_color(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_color(hwc2_compat_layer_t* layer,
                                     hwc_color_t color)
 {
     HWC2::Error error = layer->self->setColor(color);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_composition_type(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_composition_type(hwc2_compat_layer_t* layer,
                                             int type)
 {
     HWC2::Error error = layer->self->setCompositionType(
         static_cast<HWC2::Composition>(type));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_dataspace(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_dataspace(hwc2_compat_layer_t* layer,
                                         android_dataspace_t dataspace)
 {
     HWC2::Error error = layer->self->setDataspace(dataspace);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_display_frame(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_display_frame(hwc2_compat_layer_t* layer,
                                             int32_t left, int32_t top,
                                             int32_t right, int32_t bottom)
 {
     android::Rect r = {left, top, right, bottom};
 
     HWC2::Error error = layer->self->setDisplayFrame(r);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
-bool hwc2_compat_layer_set_plane_alpha(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_plane_alpha(hwc2_compat_layer_t* layer,
                                         float alpha)
 {
     HWC2::Error error = layer->self->setPlaneAlpha(alpha);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
-bool hwc2_compat_layer_set_sideband_stream(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_sideband_stream(hwc2_compat_layer_t* layer,
                                             const native_handle_t* stream)
 {
     HWC2::Error error = layer->self->setSidebandStream(stream);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
-bool hwc2_compat_layer_set_source_crop(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_source_crop(hwc2_compat_layer_t* layer,
                                         float left, float top,
                                         float right, float bottom)
 {
     android::FloatRect r = {left, top, right, bottom};
 
     HWC2::Error error = layer->self->setSourceCrop(r);
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
-bool hwc2_compat_layer_set_transform(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_transform(hwc2_compat_layer_t* layer,
                                         int transform)
 {
     HWC2::Error error = layer->self->setTransform(
         static_cast<HWC2::Transform>(transform));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
-bool hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
+hwc2_error_t hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
                                             int32_t left, int32_t top,
                                             int32_t right, int32_t bottom)
 {
     android::Rect r = {left, top, right, bottom};
 
     HWC2::Error error = layer->self->setVisibleRegion(android::Region(r));
-    return error == HWC2::Error::None;
+    return static_cast<hwc2_error_t>(error);
 }
 
 int32_t hwc2_compat_out_fences_get_fence(hwc2_compat_out_fences_t* fences,
@@ -355,6 +355,5 @@ int32_t hwc2_compat_out_fences_get_fence(hwc2_compat_out_fences_t* fences,
 
 void hwc2_compat_out_fences_destroy(hwc2_compat_out_fences_t* fences)
 {
-    fences->fences.clear();
     delete fences;
 }

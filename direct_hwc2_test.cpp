@@ -174,10 +174,8 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
     int fenceFd = hwc2_compat_out_fences_get_fence(fences, layer);
     if (fenceFd != -1)
         setFenceBufferFd(buffer, fenceFd);
-    else {
-        ALOGE("presentAndGetReleaseFences: Failed to get fence "
-              "for main layer: fence is (%d)", fenceFd);
-    }
+
+    hwc2_compat_out_fences_destroy(fences);
 
     if (lastPresentFence != -1) {
         sync_wait(lastPresentFence, -1);

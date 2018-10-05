@@ -87,50 +87,50 @@ extern "C" {
     hwc2_error_t hwc2_compat_display_get_release_fences(
                                         hwc2_compat_display_t* display,                                                hwc2_compat_out_fences_t** outFences);
 
-    bool hwc2_compat_display_present(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_present(hwc2_compat_display_t* display,
                                      int32_t* outPresentFence);
 
-    bool hwc2_compat_display_set_client_target(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_set_client_target(hwc2_compat_display_t* display,
                                                uint32_t slot,
                                                ANativeWindowBuffer* buffer,
                                                const int32_t acquireFenceFd,
                                                android_dataspace_t dataspace);
 
-    bool hwc2_compat_display_set_power_mode(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_set_power_mode(hwc2_compat_display_t* display,
                                             int mode);
-    bool hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_set_vsync_enabled(hwc2_compat_display_t* display,
                                                int enabled);
 
     hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
                                          uint32_t* outNumTypes,
                                          uint32_t* outNumRequests);
 
-    bool hwc2_compat_display_present_or_validate(hwc2_compat_display_t* display,
+    hwc2_error_t hwc2_compat_display_present_or_validate(hwc2_compat_display_t* display,
                                                  uint32_t* outNumTypes,
                                                  uint32_t* outNumRequests,
                                                  int32_t* outPresentFence,
                                                  uint32_t* state);
 
-    bool hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode);
-    bool hwc2_compat_layer_set_color(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode);
+    hwc2_error_t hwc2_compat_layer_set_color(hwc2_compat_layer_t* layer,
                                      hwc_color_t color);
-    bool hwc2_compat_layer_set_composition_type(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_composition_type(hwc2_compat_layer_t* layer,
                                                 int type);
-    bool hwc2_compat_layer_set_dataspace(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_dataspace(hwc2_compat_layer_t* layer,
                                          android_dataspace_t dataspace);
-    bool hwc2_compat_layer_set_display_frame(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_display_frame(hwc2_compat_layer_t* layer,
                                              int32_t left, int32_t top,
                                              int32_t right, int32_t bottom);
-    bool hwc2_compat_layer_set_plane_alpha(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_plane_alpha(hwc2_compat_layer_t* layer,
                                            float alpha);
-    bool hwc2_compat_layer_set_sideband_stream(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_sideband_stream(hwc2_compat_layer_t* layer,
                                                const native_handle_t* stream);
-    bool hwc2_compat_layer_set_source_crop(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_source_crop(hwc2_compat_layer_t* layer,
                                            float left, float top,
                                            float right, float bottom);
-    bool hwc2_compat_layer_set_transform(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_transform(hwc2_compat_layer_t* layer,
                                          int transform);
-    bool hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
+    hwc2_error_t hwc2_compat_layer_set_visible_region(hwc2_compat_layer_t* layer,
                                               int32_t left, int32_t top,
                                               int32_t right, int32_t bottom);
 

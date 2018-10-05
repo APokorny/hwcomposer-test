@@ -12,7 +12,8 @@ extern "C" {
 #include "nativewindowbase.h"
 
 #include <android/log.h>
-#define TRACE(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, "BaseNativeWindow", fmt "\n--> %s\n----> %s:%d", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__)
+//#define TRACE(fmt, ...) __android_log_print(ANDROID_LOG_DEBUG, "HWCNativeWindow", fmt "\n--> %s\n----> %s:%d", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__)
+#define TRACE(fmt, ...)
 
 BaseNativeWindowBuffer::BaseNativeWindowBuffer()
 {
