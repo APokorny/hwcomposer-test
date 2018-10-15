@@ -97,6 +97,7 @@ class HWComposer : public HWComposerNativeWindow
     private:
         hwc2_compat_layer_t *layer;
         hwc2_compat_display_t *hwcDisplay;
+        int lastPresentFence = -1;
     protected:
         void present(HWComposerNativeWindowBuffer *buffer);
 
@@ -149,8 +150,8 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
                                           getFenceBufferFd(buffer),
                                           HAL_DATASPACE_UNKNOWN);
 
-    int lastPresentFence;
-    hwc2_compat_display_present(hwcDisplay, &lastPresentFence);
+    int presentFence;
+    hwc2_compat_display_present(hwcDisplay, &presentFence);
 
     if (error != HWC2_ERROR_NONE) {
         ALOGE("presentAndGetReleaseFences: failed for display %lu: %s (%d)",
@@ -181,6 +182,7 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
         sync_wait(lastPresentFence, -1);
         close(lastPresentFence);
     }
+    lastPresentFence = presentFence;
 }
 
 void onVsyncReceived(int32_t sequenceId, hwc2_display_t display,
