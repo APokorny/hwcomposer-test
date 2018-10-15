@@ -127,15 +127,16 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
                                                       &numRequests);
 
     if (error != HWC2_ERROR_NONE && error != HWC2_ERROR_HAS_CHANGES) {
-        ALOGE("prepare: validate failed for display %lu: %s (%d)", displayId,
+        ALOGE("prepare: validate failed for display %d: %s (%d)",
+              (uint32_t) displayId,
               to_string(static_cast<HWC2::Error>(error)).c_str(), error);
         return;
     }
 
     if (numTypes || numRequests) {
-        ALOGE("prepare: validate required changes for display %lu: %s (%d)",
-              displayId, to_string(static_cast<HWC2::Error>(error)).c_str(),
-              error);
+        ALOGE("prepare: validate required changes for display %d: %s (%d)",
+              (uint32_t) displayId,
+              to_string(static_cast<HWC2::Error>(error)).c_str(), error);
         return;
     }
 
@@ -154,8 +155,8 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
     hwc2_compat_display_present(hwcDisplay, &presentFence);
 
     if (error != HWC2_ERROR_NONE) {
-        ALOGE("presentAndGetReleaseFences: failed for display %lu: %s (%d)",
-              displayId,
+        ALOGE("presentAndGetReleaseFences: failed for display %d: %s (%d)",
+              (uint32_t) displayId,
               to_string(static_cast<HWC2::Error>(error)).c_str(), error);
         return;
     }
@@ -166,8 +167,8 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
 
     if (error != HWC2_ERROR_NONE) {
         ALOGE("presentAndGetReleaseFences: Failed to get release fences "
-              "for display %lu: %s (%d)",
-              displayId, to_string(static_cast<HWC2::Error>(error)).c_str(),
+              "for display %d: %s (%d)",
+              (uint32_t) displayId, to_string(static_cast<HWC2::Error>(error)).c_str(),
               error);
         return;
     }

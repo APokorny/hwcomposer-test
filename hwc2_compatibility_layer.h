@@ -23,6 +23,7 @@
 
 #include <hardware/hwcomposer2.h>
 #include <system/graphics.h>
+#include <system/window.h>
 
 #ifdef __cplusplus
 extern "C" {
