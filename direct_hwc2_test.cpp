@@ -186,14 +186,14 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
     lastPresentFence = presentFence;
 }
 
-void onVsyncReceived(int32_t sequenceId, hwc2_display_t display,
-                            int64_t timestamp)
+void onVsyncReceived(HWC2EventListener* listener, int32_t sequenceId,
+                     hwc2_display_t display, int64_t timestamp)
 {
 }
 
-void onHotplugReceived(int32_t sequenceId, hwc2_display_t display,
-                            bool connected,
-                            bool primaryDisplay)
+void onHotplugReceived(HWC2EventListener* listener, int32_t sequenceId,
+                       hwc2_display_t display, bool connected,
+                       bool primaryDisplay)
 {
     ALOGI("onHotplugReceived(%d, %" PRIu64 ", %s, %s)",
         sequenceId, display,
@@ -209,7 +209,8 @@ void onHotplugReceived(int32_t sequenceId, hwc2_display_t display,
     hotplugCv.notify_all();
 }
 
-void onRefreshReceived(int32_t sequenceId, hwc2_display_t display)
+void onRefreshReceived(HWC2EventListener* listener,
+                       int32_t sequenceId, hwc2_display_t display)
 {
 }
 

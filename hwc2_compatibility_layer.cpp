@@ -48,7 +48,7 @@ void HWComposerCallback::onVsyncReceived(int32_t sequenceId,
                                          hwc2_display_t display,
                                          int64_t timestamp)
 {
-    listener->on_vsync_received(sequenceId, display, timestamp);
+    listener->on_vsync_received(listener, sequenceId, display, timestamp);
 }
 
 void HWComposerCallback::onHotplugReceived(int32_t sequenceId,
@@ -56,7 +56,7 @@ void HWComposerCallback::onHotplugReceived(int32_t sequenceId,
                                            HWC2::Connection connection,
                                            bool primaryDisplay)
 {
-    listener->on_hotplug_received(sequenceId, display,
+    listener->on_hotplug_received(listener, sequenceId, display,
                                   connection == HWC2::Connection::Connected,
                                   primaryDisplay);
 }
@@ -64,7 +64,7 @@ void HWComposerCallback::onHotplugReceived(int32_t sequenceId,
 void HWComposerCallback::onRefreshReceived(int32_t sequenceId,
                                            hwc2_display_t display)
 {
-    listener->on_refresh_received(sequenceId, display);
+    listener->on_refresh_received(listener, sequenceId, display);
 }
 
 struct hwc2_compat_device
