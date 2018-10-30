@@ -264,6 +264,26 @@ hwc2_error_t hwc2_compat_display_validate(hwc2_compat_display_t* display,
     return static_cast<hwc2_error_t>(error);
 }
 
+hwc2_error_t hwc2_compat_layer_set_buffer(hwc2_compat_layer_t* layer,
+                                          uint32_t slot,
+                                          ANativeWindowBuffer* buffer,
+                                          const int32_t acquireFenceFd)
+{
+    android::sp<android::GraphicBuffer> target(
+        new android::GraphicBuffer(buffer->handle,
+            android::GraphicBuffer::WRAP_HANDLE,
+            buffer->width, buffer->height,
+            buffer->format, /* layerCount */ 1,
+            buffer->usage, buffer->stride));
+
+    android::sp<android::Fence> acquireFence(
+            new android::Fence(acquireFenceFd));
+
+    HWC2::Error error = layer->self->setBuffer(0, target, acquireFence);
+
+    return static_cast<hwc2_error_t>(error);
+}
+
 hwc2_error_t hwc2_compat_layer_set_blend_mode(hwc2_compat_layer_t* layer, int mode)
 {
     HWC2::Error error = layer->self->setBlendMode(
